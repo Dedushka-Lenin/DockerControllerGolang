@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/account/css/style.css">
+</head>
+<body>
+    <h1>Вход в систему</h1>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label for="login">Логин:</label>
+            <input type="text" id="login" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" required>
+                <button type="button" class="toggle-password" onclick="togglePass('password')">👁️</button>
+            </div>
+        </div>
+
+        <button type="submit" id="loginBtn">Войти</button>
+
+        <div id="error-message" class="error-text"></div>
+
+        <div class="register-redirect" style="margin-top: 15px; text-align: center;">
+            Нет аккаунта? <a href="/register/">Зарегистрироваться</a>
+        </div>
+    </form>
+
+    <script src="/static/js/request.js"></script>
+    
+    <script>
+        function togglePass(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.type = field.type === "password" ? "text" : "password";
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const login = document.getElementById('login').value;
+            const pass = document.getElementById('password').value;
+            const errorElement = document.getElementById('error-message');
+
+            errorElement.textContent = "";
+
+            const urlPath = `/account-login/`;
+            const loginData = { login: login, password: pass };
+
+            try {
+                const response = await loadData('POST', urlPath, loginData); 
+                window.location.href = "/"; 
+            } catch (error) {
+                errorElement.textContent = error.message || "Неверный логин или пароль";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Docker Controller</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+
+    <!-- Шапка сайта -->
+    <header class="main-header">
+        <button id="btn-create" class="btn btn-success">Создать контейнер</button>
+        <button id="btn-logout" class="btn btn-danger">Выйти из аккаунта</button>
+    </header>
+
+    <!-- Основной контент -->
+    <div class="main-layout">
+        <!-- Левый столбец: Список контейнеров -->
+        <aside class="sidebar">
+            <h2>Контейнеры</h2>
+            <ul id="containers-list" class="list-group">
+                <!-- Сюда JavaScript добавит контейнеры -->
+                <li class="loading">Загрузка...</li>
+            </ul>
+        </aside>
+
+        <!-- Правый столбец: Кнопки управления (появляется при клике) -->
+        <main id="control-panel" class="control-panel hidden">
+            <h3 id="selected-container-title">Управление</h3>
+            <div class="control-actions">
+                <button id="btn-container" class="btn btn-primary">Container</button>
+                <button id="btn-logs" class="btn btn-primary">Logs</button>
+                <button id="btn-console" class="btn btn-primary">Console</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Модальное окно создания контейнера -->
+    <div id="modal-create" class="modal-overlay hidden">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Создать контейнер</h3>
+                <button id="btn-modal-close" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Блок для имени контейнера -->
+                <div class="form-group">
+                    <label for="input-name">Название контейнера</label>
+                    <input type="text" id="input-name" placeholder="например, my-web-app">
+                </div>
+
+                <!-- Блок для URL образа -->
+                <div class="form-group">
+                    <label for="input-url">URL-адрес образа</label>
+                    <input type="text" id="input-url" placeholder="например, library/ubuntu:latest">
+                </div>
+
+                <!-- Блок вывода ошибки (только один) -->
+                <div id="modal-error" class="error-message hidden"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn-modal-submit" class="btn btn-success">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение логики -->
+    <script src="/static/js/request.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
