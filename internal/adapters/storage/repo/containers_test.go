@@ -97,10 +97,10 @@ func TestContainersRepo_Check(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 
 		mock.ExpectQuery(regexp.QuoteMeta(storage.ContainersQueryCheck)).
-			WithArgs(42, "user_login").
+			WithArgs("id", "user_login").
 			WillReturnRows(rows)
 
-		exists, err := repo.Check("user_login", 42)
+		exists, err := repo.Check("id", "user_login")
 
 		assert.NoError(t, err)
 		assert.True(t, exists)
@@ -115,10 +115,10 @@ func TestContainersRepo_Check(t *testing.T) {
 		repo := repo.NewContainersRepo(db)
 
 		mock.ExpectQuery(regexp.QuoteMeta(storage.ContainersQueryCheck)).
-			WithArgs(42, "user_login").
+			WithArgs("id", "user_login").
 			WillReturnError(errors.New("db error"))
 
-		exists, err := repo.Check("user_login", 42)
+		exists, err := repo.Check("id", "user_login")
 
 		assert.Error(t, err)
 		assert.False(t, exists)
@@ -183,7 +183,7 @@ func TestContainersRepo_GetById(t *testing.T) {
 			WithArgs(10).
 			WillReturnRows(rows)
 
-		res, err := repo.GetById(10)
+		res, err := repo.GetById("id")
 
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
@@ -203,7 +203,7 @@ func TestContainersRepo_GetById(t *testing.T) {
 			WithArgs(999).
 			WillReturnError(sql.ErrNoRows)
 
-		res, err := repo.GetById(999)
+		res, err := repo.GetById("id")
 
 		assert.ErrorIs(t, err, sql.ErrNoRows)
 		assert.Nil(t, res)

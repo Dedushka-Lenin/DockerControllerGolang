@@ -98,16 +98,18 @@ func NewServer(cfg *config.Config) (*Server, error) {
 	containersGroup := protectedGroup.Group("containers")
 	{
 		containersGroup.POST("/create/", containers.Create)
-		containersGroup.DELETE("/delete/:id", containers.Delete)
+		containersGroup.DELETE("/delete/", containers.Delete)
 
-		containersGroup.GET("/status/:id", containers.GetStatus)
+		containersGroup.GET("/status/", containers.GetStatus)
 		containersGroup.GET("/get", containers.GetList)
 
-		containersGroup.GET("/logs/:id", containers.Logs)
+		containersGroup.POST("/logs/", containers.Logs)
 
-		containersGroup.POST("/start/:id", containers.Start)
-		containersGroup.POST("/stop/:id", containers.Stop)
-		containersGroup.POST("/restart/:id", containers.Restart)
+		containersGroup.POST("/start/", containers.Start)
+		containersGroup.POST("/stop/", containers.Stop)
+		containersGroup.POST("/restart/", containers.Restart)
+
+		containersGroup.POST("/exec", containers.Exec)
 	}
 
 	return &Server{

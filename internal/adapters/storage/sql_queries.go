@@ -16,8 +16,8 @@ const (
 
 const (
 	ContainersQueryCreate  = `INSERT INTO containers (login, container_name, container_id) VALUES ($1, $2, $3) RETURNING id;`
-	ContainersQueryDelete  = `DELETE FROM containers WHERE id = $1`
-	ContainersQueryCheck   = `SELECT EXISTS (SELECT 1 FROM containers WHERE id = $1 AND login = $2)`
+	ContainersQueryDelete  = `DELETE FROM containers WHERE container_id = $1`
+	ContainersQueryCheck   = `SELECT EXISTS (SELECT 1 FROM containers WHERE container_id = $1 AND login = $2)`
 	ContainersQueryGetList = `SELECT container_id, container_name FROM containers WHERE login = $1`
-	ContainersQueryGet     = `SELECT containers FROM users WHERE id = $1`
+	ContainersQueryGet     = `SELECT container_id, container_name FROM containers WHERE container_id = $1`
 )

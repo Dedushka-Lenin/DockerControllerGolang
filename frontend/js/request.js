@@ -1,9 +1,7 @@
 async function loadData(method, url, data) {
     try {
-        // Переводим метод в верхний регистр для точной проверки
         const requestMethod = method.toUpperCase();
 
-        // Базовые опции без поля body
         const options = {
             method: requestMethod,
             headers: {
@@ -11,12 +9,10 @@ async function loadData(method, url, data) {
             }
         };
 
-        // Добавляем body ТОЛЬКО для методов, которые его поддерживают (POST, PUT, DELETE и т.д.)
         if (requestMethod !== 'GET' && requestMethod !== 'HEAD' && data !== undefined && data !== null && data !== '') {
             options.body = JSON.stringify(data);
         }
 
-        // Выполняем fetch с очищенными опциями
         const response = await fetch(url, options);
 
         let result = null;

@@ -1,36 +1,58 @@
-/* Общие стили */
+/* --- Переменные (Для удобной кастомизации цвета) --- */
+:root {
+    --bg-main: #f4f6f9;
+    --bg-white: #ffffff;
+    --border-color: #e0e0e0;
+    --text-main: #333333;
+    --text-muted: #666666;
+    
+    --primary: #007bff;
+    --primary-hover: #0056b3;
+    --success: #28a745;
+    --success-hover: #218838;
+    --danger: #dc3545;
+    --danger-hover: #c82333;
+    --warning: #d29922;
+    --warning-hover: #b8841b;
+}
+
+/* --- Общие стили --- */
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
-    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
 
-/* Шапка (Header) */
+/* --- Шапка (Header) --- */
 .main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: #ffffff;
-    border-bottom: 2px solid #e0e0e0; /* Отделяющая полоска */
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Сетка для столбцов */
+/* --- Сетка для столбцов --- */
 .main-layout {
     display: flex;
     flex: 1;
     overflow: hidden;
 }
 
-/* Левый столбец (Список) */
+/* --- Левый столбец (Список) --- */
 .sidebar {
     width: 300px;
-    background-color: #ffffff;
-    border-right: 1px solid #e0e0e0;
+    background-color: var(--bg-white);
+    border-right: 1px solid var(--border-color);
     padding: 20px;
     overflow-y: auto;
 }
@@ -38,7 +60,7 @@ body {
 .sidebar h2 {
     margin-top: 0;
     font-size: 1.2rem;
-    color: #555;
+    color: var(--text-muted);
 }
 
 .list-group {
@@ -52,9 +74,9 @@ body {
     margin-bottom: 8px;
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .container-item:hover {
@@ -62,16 +84,16 @@ body {
 }
 
 .container-item.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
+    background-color: var(--primary);
+    color: var(--bg-white);
+    border-color: var(--primary);
 }
 
-/* Правый столбец (Управление) */
+/* --- Правый столбец (Управление) --- */
 .control-panel {
     flex: 1;
     padding: 20px;
-    background-color: #f4f6f9;
+    background-color: var(--bg-main);
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -82,76 +104,94 @@ body {
     gap: 10px;
 }
 
-/* Кнопки */
+/* --- Кнопки --- */
 .btn {
     padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.btn:hover { opacity: 0.9; }
-.btn-success { background-color: #28a745; color: white; }
-.btn-danger { background-color: #dc3545; color: white; }
-.btn-primary { background-color: #007bff; color: white; }
-.btn-secondary { background-color: #6c757d; color: white; }
+.btn:focus-visible {
+    outline: 3px solid rgba(0, 123, 255, 0.25);
+}
 
-/* Вспомогательные классы */
+.btn-success { background-color: var(--success); color: white; }
+.btn-success:hover { background-color: var(--success-hover); }
+
+.btn-danger { background-color: var(--danger); color: white; }
+.btn-danger:hover { background-color: var(--danger-hover); }
+
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-primary:hover { background-color: var(--primary-hover); }
+
+.btn-warning { background-color: var(--warning); color: white; }
+.btn-warning:hover { background-color: var(--warning-hover); }
+
+/* --- Вспомогательные классы --- */
 .hidden { display: none !important; }
 .loading { color: #888; font-style: italic; }
 
-/* --- Модальное окно --- */
+/* --- Модальное окно (Приведено к общему светлому стилю) --- */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Затемнение фона */
+    background-color: rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Поверх всего */
+    z-index: 1000;
+    backdrop-filter: blur(2px); /* Легкое размытие заднего плана */
 }
 
 .modal-window {
-    background-color: #16161a;
-    border: 1px solid #2a2a32;
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     width: 450px;
-    max-width: 90%;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    max-width: 95%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
+    animation: modalFadeIn 0.2s ease-out; /* Плавное появление */
 }
 
 .modal-header {
     padding: 16px 20px;
-    border-bottom: 1px solid #2a2a32;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .modal-header h3 {
+    margin: 0;
     font-size: 18px;
-    color: #ffffff;
+    color: var(--text-main);
 }
 
 .btn-close {
     background: none;
     border: none;
-    color: #8b949e;
-    font-size: 24px;
+    color: #999;
+    font-size: 28px;
     cursor: pointer;
     line-height: 1;
-    padding: 0 4px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
 }
 
 .btn-close:hover {
-    color: #ffffff;
+    color: var(--text-main);
 }
 
 .modal-body {
@@ -164,34 +204,38 @@ body {
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .form-group label {
     font-size: 14px;
-    color: #8b949e;
+    font-weight: 500;
+    color: var(--text-muted);
 }
 
 .form-group input {
-    background-color: #1e1e24;
-    border: 1px solid #30363d;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
     border-radius: 6px;
     padding: 10px 12px;
-    color: #ffffff;
+    color: var(--text-main);
     font-size: 14px;
     outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .form-group input:focus {
-    border-color: #388bfd;
+    border-color: var(--primary);
+    background-color: var(--bg-white);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
 /* Ошибка внутри модального окна */
 .error-message {
-    background-color: rgba(248, 81, 73, 0.1);
-    border: 1px solid rgba(248, 81, 73, 0.4);
-    color: #ff7b72;
-    padding: 10px 12px;
+    background-color: rgba(220, 53, 69, 0.08);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: var(--danger);
+    padding: 12px;
     border-radius: 6px;
     font-size: 13px;
     line-height: 1.4;
@@ -199,16 +243,135 @@ body {
 
 .modal-footer {
     padding: 16px 20px;
-    border-top: 1px solid #2a2a32;
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: flex-end;
 }
 
-.btn-warning {
-    background-color: #d29922;
-    color: #ffffff;
+/* Анимация появления */
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.btn-warning:hover {
-    background-color: #bb861c;
+/* Переключатели вкладок */
+.control-tabs {
+    display: flex;
+    gap: 5px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.btn-tab {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    padding: 10px 20px;
+}
+
+.btn-tab:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    opacity: 1;
+}
+
+.btn-tab.active {
+    background-color: var(--bg-white);
+    color: var(--primary);
+    border-color: var(--border-color);
+    margin-bottom: -12px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Стили вкладок (Pane) */
+.pane {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 200px;
+}
+
+/* Блок статуса и бейджи */
+.status-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.status-badge.running { background-color: rgba(40, 167, 69, 0.15); color: var(--success); }
+.status-badge.stopped { background-color: rgba(220, 53, 69, 0.15); color: var(--danger); }
+
+.action-zone {
+    display: flex;
+    gap: 12px;
+}
+
+/* Оформление терминала логов и консоли */
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.terminal-viewer {
+    background-color: #1e1e24;
+    color: #f8f8f2;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 0;
+    height: 350px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: inset 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+/* Интерактивная консоль */
+.console-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+#console-output {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+.console-input-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #333;
+    padding-top: 8px;
+}
+.console-input-line .prompt { color: var(--success); font-weight: bold; }
+#input-console {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
 }

@@ -1,12 +1,14 @@
 package containers
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/Dedushka-Lenin/DockerControllerGolang/internal/adapters/config"
 	"github.com/Dedushka-Lenin/DockerControllerGolang/internal/domain"
@@ -17,14 +19,15 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/go-git/go-git/v5"
 	"github.com/moby/go-archive"
+	"github.com/moby/moby/api/pkg/stdcopy"
 )
 
 type ContainersRepo interface {
 	Create(login, container_id, container_name string) (int, error)
 	Delete(login string) error
-	Check(login string, id int) (bool, error)
+	Check(login string, id string) (bool, error)
 	GetList(login string) ([]domain.Container, error)
-	GetById(id int) (*domain.Container, error)
+	GetById(id string) (*domain.Container, error)
 }
 
 type Containers struct {
@@ -73,7 +76,7 @@ func (c *Containers) Create(login, name, url string) error {
 	return nil
 }
 
-func (c *Containers) Delete(login string, id int) error {
+func (c *Containers) Delete(login string, id string) error {
 	containerData, err := c.get(login, id)
 	if err != nil {
 		log.Println("Delete. get. err: " + err.Error())
@@ -92,7 +95,13 @@ func (c *Containers) Delete(login string, id int) error {
 		Force:         true,
 		PruneChildren: true,
 	})
+
 	if err != nil {
+		log.Println("Delete. ImageRemove. err: " + err.Error())
+		return err
+	}
+
+	if c.cr.Delete(id); err != nil {
 		log.Println("Delete. ImageRemove. err: " + err.Error())
 		return err
 	}
@@ -101,7 +110,7 @@ func (c *Containers) Delete(login string, id int) error {
 	return nil
 }
 
-func (c *Containers) GetStatus(login string, id int) (string, error) {
+func (c *Containers) GetStatus(login string, id string) (string, error) {
 	containerData, err := c.get(login, id)
 	if err != nil {
 		log.Println("GetStatus. get. err: " + err.Error())
@@ -153,7 +162,7 @@ func (c *Containers) Logs(login string, data domain.ContainerLogsData) (string, 
 	return string(content), nil
 }
 
-func (c *Containers) Start(login string, id int) error {
+func (c *Containers) Start(login string, id string) error {
 	containerData, err := c.get(login, id)
 	if err != nil {
 		log.Println("Start. get. err: " + err.Error())
@@ -164,7 +173,7 @@ func (c *Containers) Start(login string, id int) error {
 	return err
 }
 
-func (c *Containers) Stop(login string, id int) error {
+func (c *Containers) Stop(login string, id string) error {
 	containerData, err := c.get(login, id)
 	if err != nil {
 		log.Println("Stop. get. err: " + err.Error())
@@ -175,7 +184,7 @@ func (c *Containers) Stop(login string, id int) error {
 	return err
 }
 
-func (c *Containers) Restart(login string, id int) error {
+func (c *Containers) Restart(login string, id string) error {
 	containerData, err := c.get(login, id)
 	if err != nil {
 		log.Println("Restart. get. err: " + err.Error())
@@ -184,6 +193,55 @@ func (c *Containers) Restart(login string, id int) error {
 
 	err = c.client.ContainerRestart(c.ctx, containerData.Id, container.StopOptions{})
 	return err
+}
+
+func (c *Containers) Exec(login string, id string, cmd string) (string, error) {
+	// Настройка создания exec-процесса
+	execConfig := container.ExecOptions{
+		AttachStdout: true,
+		AttachStderr: true,
+		Cmd:          []string{"sh", "-c", cmd},
+	}
+
+	// 1. Создаем конфигурацию exec команды
+	execIDResp, err := c.client.ContainerExecCreate(c.ctx, id, execConfig)
+	if err != nil {
+		return "", err
+	}
+
+	// 2. ИСПОЛЬЗУЕМ ATTACH ВМЕСТО START: это запускает команду и дает нам поток HijackedResponse
+	attachConfig := container.ExecStartOptions{
+		Detach: false,
+		Tty:    false,
+	}
+	resp, err := c.client.ContainerExecAttach(c.ctx, execIDResp.ID, attachConfig)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Close()
+
+	// Буферы для записи вывода
+	var stdout, stderr bytes.Buffer
+
+	// 3. Копируем данные из потока и очищаем их от системных заголовков Docker
+	_, err = stdcopy.StdCopy(&stdout, &stderr, resp.Reader)
+	if err != nil {
+		return "", err
+	}
+
+	output := stdout.String()
+	if stderr.Len() > 0 {
+		if output != "" {
+			output += "\n"
+		}
+		output += "[STDERR]: " + stderr.String()
+	}
+
+	if strings.TrimSpace(output) == "" {
+		output = "Команда выполнена успешно (вывод пуст)"
+	}
+
+	return output, nil
 }
 
 func (c *Containers) clone(url, path string) error {
@@ -229,10 +287,10 @@ func (c *Containers) createContainer(path, name string) (string, error) {
 	return resp.ID, nil
 }
 
-func (c *Containers) get(login string, id int) (*domain.Container, error) {
+func (c *Containers) get(login string, id string) (*domain.Container, error) {
 	if exists, err := c.cr.Check(login, id); !exists {
 		log.Println("get. Check. err: container does not exist")
-		return nil, fmt.Errorf("TODO")
+		return nil, fmt.Errorf("container does not exist")
 	} else if err != nil {
 		log.Println("get. Check. err: " + err.Error())
 		return nil, err

@@ -36,6 +36,3 @@ cd DockerControllerGolang
 
 4. Тестовые ссылки:
     `https://github.com/Dedushka-Lenin/Hello-World-Container`
-
-
-<!-- python -m http.server 3000 -->

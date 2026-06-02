@@ -7,21 +7,24 @@ import (
 	"github.com/Dedushka-Lenin/DockerControllerGolang/internal/adapters/config"
 	"github.com/Dedushka-Lenin/DockerControllerGolang/internal/domain"
 	tokenM "github.com/Dedushka-Lenin/DockerControllerGolang/internal/domain"
+
 	"github.com/gin-gonic/gin"
 )
 
 type Containers interface {
 	Create(login, name, url string) error
-	Delete(login string, id int) error
+	Delete(login string, id string) error
 
-	GetStatus(login string, id int) (string, error)
+	GetStatus(login string, id string) (string, error)
 	GetList(login string) ([]domain.Container, error)
 
 	Logs(login string, data domain.ContainerLogsData) (string, error)
 
-	Start(login string, id int) error
-	Stop(login string, id int) error
-	Restart(login string, id int) error
+	Start(login string, id string) error
+	Stop(login string, id string) error
+	Restart(login string, id string) error
+
+	Exec(login string, id string, cmd string) (string, error)
 }
 
 type ContainersHandlers struct {
@@ -186,8 +189,10 @@ func (ch *ContainersHandlers) Logs(c *gin.Context) {
 		return
 	}
 
+	log.Println(containerLogs)
+
 	log.Println("Logs. err: nil")
-	c.JSON(http.StatusOK, gin.H{"error": nil, "container_logs": containerLogs})
+	c.JSON(http.StatusOK, gin.H{"error": nil, "logs": containerLogs})
 }
 
 func (ch *ContainersHandlers) Start(c *gin.Context) {
@@ -284,4 +289,39 @@ func (ch *ContainersHandlers) Restart(c *gin.Context) {
 
 	log.Println("Restart. err: nil")
 	c.JSON(http.StatusOK, gin.H{"error": nil})
+}
+
+func (ch *ContainersHandlers) Exec(c *gin.Context) {
+	token, err := ch.tkn.GetToken(c)
+	if err != nil {
+		log.Println("Exec. GetToken. err: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": tokenM.InvalidToken})
+		return
+	}
+
+	login, err := ch.tkn.GetLogin(token)
+	if err != nil {
+		log.Println("Exec. GetLogin. err: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": tokenM.InvalidToken})
+		return
+	}
+
+	var req domain.ExecRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Exec. ShouldBindJSON. err: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса: " + err.Error()})
+		return
+	}
+
+	output, err := ch.container.Exec(login, req.ID, req.Cmd)
+	if err != nil {
+		log.Println("Exec. Exec. err: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"error":  nil,
+		"output": output,
+	})
 }

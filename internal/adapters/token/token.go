@@ -105,6 +105,9 @@ func (t *Token) Set(c *gin.Context, login, token string) error {
 
 func (t *Token) check(login, tokenString string) (bool, error) {
 	if exists, err := t.tr.Check(login); !exists {
+		log.Println("check. Check. err: не найденно")
+		return false, err
+	} else if err != nil {
 		log.Println("check. Check. err: " + err.Error())
 		return false, err
 	}
